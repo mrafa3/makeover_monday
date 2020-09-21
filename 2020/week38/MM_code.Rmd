@@ -3,20 +3,6 @@ title: "R Notebook"
 output: html_notebook
 ---
 
-# Notes  
-
-Some highlights:
-
-*  Using `httr::` and `readxl::` packages to pull down data from data.world.
-*  Using the `zoo::as.yearmon()` function to convert into a date format.  
-*  Experimenting with some small multiples techniques (inspired by kjhealy's COVID-19 visualzation: https://github.com/kjhealy/covid).  
-*  Mapping the data to show divergent story from most recent data, which 
-
-Further development:  
-*  Creating `year_month` using an intermediate step, but could have used `stringr::` and `lubridate::` for more direct approach.  
-*  Mapping (and the mapped story) is preliminary.  
-*  Tried to implement `RColorBrewer::` in the map, but had some challenges and moved on.  
-
 # Setup
 
 ```{r setup, include=TRUE}
