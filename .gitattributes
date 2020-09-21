@@ -1,2 +1,5 @@
 # Reclassifying .html extension so that it is recognized as R code
 *.html linguist-language=R
+
+# Reclassifying .md extension so that it is recognized as R code
+*.md linguist-language=R
