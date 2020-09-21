@@ -1,0 +1,112 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r setup, include=TRUE}
+library(tidyverse)
+library(httr)
+library(readxl)
+library(lubridate)
+library(zoo)
+library(magrittr)
+library(viridis)
+```
+
+```{r read_data, include=TRUE}
+GET("https://query.data.world/s/h5cw7k322n3kptttmta7q5hirzh5fa", write_disk(tf <- tempfile(fileext = ".xlsx")))
+df <- read_excel(tf)
+```
+
+```{r rename_cols, include=TRUE}
+df %<>% 
+  slice(-1) %>% 
+  rename(category = `Table 1`,
+         country = `...2`,
+         year_month = `...3`,
+         index_2015_100 = `...4`)
+```
+
+```{r}
+df %>% 
+  glimpse()
+```
+
+```{r}
+df %>% 
+  mutate()
+```
+
+
+
+```{r refactor_mutate, include=TRUE}
+(df %<>% 
+  #stringr would be cleaner, but this works
+  separate(year_month, into = c('year', 'month'), sep = 'M') %>% 
+  mutate(year_month = paste(year, month, sep = '-'),
+         index_2015_100 = as.numeric(index_2015_100)) %>% 
+  mutate(year_month = as.yearmon(year_month)) %>% 
+  select(1, 2, 5, 6))
+```
+
+```{r}
+df %>% 
+  summary()
+```
+
+```{r}
+df %>% 
+  group_by()
+```
+
+
+```{r}
+df %>% 
+  filter(country == 'Austria') %>% 
+  ggplot(.) + 
+  geom_line(aes(x=year_month,
+                y=index_2015_100,
+                group=category,
+                color=category)) + 
+  theme_minimal()
+```
+
+```{r df_2, include=TRUE}
+df_2 <- df %>% 
+  spread(category, index_2015_100) %>% 
+  mutate(cost_diff = Books - `All-items HICP`)
+```
+
+```{r map_world, include=TRUE}
+map_world <- map_data("world")
+
+map_world %<>% 
+  mutate(region = recode(region,
+                         'Czech Republic' = 'Czechia',
+                         'Macedonia' = 'North Macedonia',
+                         'UK' = 'United Kingdom',
+                         'USA' = 'United States'))
+```
+
+```{r join_map, include=TRUE}
+df_2 %<>% 
+  left_join(x=.,
+            y=map_world,
+            by=c('country' = 'region'))
+```
+
+```{r fig.height=8}
+df_2 %>% 
+  filter(year_month == 'Aug 2020',
+         country != 'United States') %>% 
+  ggplot(.) +
+  geom_polygon(aes(x = long, y = lat, group = group, fill = cost_diff), color="gray60") +
+  scale_fill_viridis() + 
+  ggtitle('Cost difference',
+          subtitle = 'August 2020') + 
+  #labs(caption = 'Using 2014 value if 2015 is NA') + 
+  #coord_map(xlim = c(-30, 60),ylim = c(45, -37)) + 
+  #map.theme + 
+  theme(plot.title = element_text(size=24),
+        plot.subtitle = element_text(size=18))
+```
