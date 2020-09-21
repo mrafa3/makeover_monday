@@ -24,12 +24,12 @@ Further development:
 ## Visualization  
 
 **Original visualization**:
-![](/2020/week38/graphics/yvxBGUv9Q9GJCt6g6pAZ_Price develpment of books in the EU.png)
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week38/graphics/yvxBGUv9Q9GJCt6g6pAZ_Price%20develpment%20of%20books%20in%20the%20EU.png)
 
 **Alternatives developed**:
-![](/2020/week38/graphics/eu_ts_viz.png)
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week38/graphics/eu_ts_viz.png)
 
-![](/2020/week38/graphics/map_viz/png)
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week38/graphics/map_viz.png)
 
-![](/2020/week38/graphics/sm_viz.png)
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week38/graphics/sm_viz.png)
 
