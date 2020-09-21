@@ -7,6 +7,8 @@ Repo for Makeover Monday exercise, Week 38 (2020).
 
 [Source metadata](https://ec.europa.eu/eurostat/cache/metadata/en/prc_hicp_esms.htm)
 
+## Notes  
+
 Some highlights:
 
 *  Using `httr::` and `readxl::` packages to pull down data from data.world.
@@ -19,8 +21,12 @@ Further development:
 *  Mapping (and the mapped story) is preliminary.  
 *  Tried to implement `RColorBrewer::` in the map, but had some challenges and moved on.  
 
-![Original visualization](/2020/week38/graphics/yvxBGUv9Q9GJCt6g6pAZ_Price develpment of books in the EU.png)
+## Visualization  
 
+**Original visualization**:
+![](/2020/week38/graphics/yvxBGUv9Q9GJCt6g6pAZ_Price develpment of books in the EU.png)
+
+**Alternatives developed**:
 ![](/2020/week38/graphics/eu_ts_viz.png)
 
 ![](/2020/week38/graphics/map_viz/png)
