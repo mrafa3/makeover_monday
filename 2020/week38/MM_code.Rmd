@@ -85,8 +85,8 @@ df %>%
 
 Plotting some simple time series stories from the data.
 
-```{r eu_viz, include=TRUE}
-df %>% 
+```{r eu_ts_viz, include=TRUE}
+(eu_ts_viz <- df %>% 
   filter(country == 'EU27_2020 - European Union - 27 countries (from 2020)',
          year_month >= 'Jan 2010') %>% 
   ggplot(.) + 
@@ -100,7 +100,7 @@ df %>%
        y='HCPI, 2015 = 100\n',
        color='') + 
   theme_minimal() + 
-  theme(legend.position = 'top')
+  theme(legend.position = 'top'))
 ```
 
 
@@ -140,7 +140,7 @@ country_panel <- df %>%
 ```
 
 ```{r plot_small_multiples, fig.height=12, fig.width=10}
-df  %>%
+(sm_viz <- df %>%
   filter(!country %in% 
            c('United States', 
              'EU27_2020 - European Union - 27 countries (from 2020)'), 
@@ -183,7 +183,7 @@ df  %>%
         axis.title.x = element_text(size = rel(1)),
         axis.title.y = element_text(size = rel(1)),
         axis.text.x = element_text(size = rel(.75), angle = 90),
-        legend.text = element_text(size = rel(1)))
+        legend.text = element_text(size = rel(1))))
 ```
 
 ## Mapping  
@@ -215,7 +215,7 @@ df_2 %<>%
 ```
 
 ```{r map_diff, fig.height=8}
-df_2 %>% 
+(map_viz <- df_2 %>% 
   filter(year_month == 'Aug 2020',
          country != 'United States') %>% 
   ggplot(.) +
@@ -228,5 +228,18 @@ df_2 %>%
   labs(caption = 'August 2020') + 
   map.theme + 
   theme(plot.title = element_text(size=24),
-        plot.subtitle = element_text(size=18))
+        plot.subtitle = element_text(size=18)))
+```
+
+# Saving graphics  
+
+```{r save_graphics, include=TRUE}
+ggsave("graphics/eu_ts_viz.png", eu_ts_viz,
+       width = 10, height = 8, dpi = 300)
+
+ggsave("graphics/sm_viz.png", sm_viz,
+       width = 10, height = 12, dpi = 300)
+
+ggsave("graphics/map_viz.png", map_viz,
+       width = 10, height = 8, dpi = 300)
 ```
