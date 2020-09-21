@@ -1,0 +1,2 @@
+# Reclassifying .html extension so that it is recognized as R code
+*.html linguist-language=R
