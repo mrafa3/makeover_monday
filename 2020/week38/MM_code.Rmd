@@ -3,14 +3,48 @@ title: "R Notebook"
 output: html_notebook
 ---
 
+# Notes  
+
+Some highlights:
+
+*  Using `httr::` and `readxl::` packages to pull down data from data.world.
+*  Using the `zoo::as.yearmon()` function to convert into a date format.  
+*  Experimenting with some small multiples techniques (inspired by kjhealy's COVID-19 visualzation: https://github.com/kjhealy/covid).  
+*  Mapping the data to show divergent story from most recent data, which 
+
+Further development:  
+*  Creating `year_month` using an intermediate step, but could have used `stringr::` and `lubridate::` for more direct approach.  
+*  Mapping (and the mapped story) is preliminary.  
+*  Tried to implement `RColorBrewer::` in the map, but had some challenges and moved on.  
+
+# Setup
+
 ```{r setup, include=TRUE}
 library(tidyverse)
 library(httr)
 library(readxl)
-library(lubridate)
 library(zoo)
 library(magrittr)
 library(viridis)
+#library(lubridate)
+#library(RColorBrewer)
+```
+
+```{r map.theme, include=TRUE}
+map.theme <- theme(text = element_text(color = "#FFFFFF"), 
+                   panel.background = element_rect(fill = "#444444"),
+                   plot.background = element_rect(fill = "#444444"),
+                   panel.grid = element_blank(),
+                   plot.title = element_text(size = 50),
+                   plot.subtitle = element_text(size = 25),
+                   plot.caption = element_text(size = 20), 
+                   axis.text = element_blank(),
+                   axis.title = element_blank(),
+                   axis.ticks = element_blank(),
+                   legend.position = "bottom", 
+                   legend.key.size = unit(1, "cm"),
+                   legend.background = element_rect(fill="#444444"),
+                   legend.title = element_blank())
 ```
 
 ```{r read_data, include=TRUE}
@@ -27,17 +61,10 @@ df %<>%
          index_2015_100 = `...4`)
 ```
 
-```{r}
+```{r glimpse, include=TRUE}
 df %>% 
   glimpse()
 ```
-
-```{r}
-df %>% 
-  mutate()
-```
-
-
 
 ```{r refactor_mutate, include=TRUE}
 (df %<>% 
@@ -49,27 +76,119 @@ df %>%
   select(1, 2, 5, 6))
 ```
 
-```{r}
+```{r summary, include=TRUE}
 df %>% 
   summary()
 ```
 
-```{r}
-df %>% 
-  group_by()
-```
+## Time series visualization  
 
+Plotting some simple time series stories from the data.
 
-```{r}
+```{r eu_viz, include=TRUE}
 df %>% 
-  filter(country == 'Austria') %>% 
+  filter(country == 'EU27_2020 - European Union - 27 countries (from 2020)',
+         year_month >= 'Jan 2010') %>% 
   ggplot(.) + 
   geom_line(aes(x=year_month,
                 y=index_2015_100,
                 group=category,
-                color=category)) + 
-  theme_minimal()
+                color=category),
+            size=1.1) + 
+  ggtitle('Book prices vs total consumer prices in the European Union') + 
+  labs(x='',
+       y='HCPI, 2015 = 100\n',
+       color='') + 
+  theme_minimal() + 
+  theme(legend.position = 'top')
 ```
+
+
+```{r denmark_viz, include=TRUE}
+df %>% 
+  filter(country == 'Denmark',
+         year_month >= 'Jan 2010') %>% 
+  ggplot(.) + 
+  geom_line(aes(x=year_month,
+                y=index_2015_100,
+                group=category,
+                color=category),
+            size=1.1) + 
+  ggtitle('Book prices vs total consumer prices in the Denmark') + 
+  labs(x='',
+       y='HCPI, 2015 = 100\n',
+       color='') + 
+  theme_minimal() + 
+  theme(legend.position = 'top')
+```
+
+## Small multiples  
+
+This code borrows heavily from https://github.com/kjhealy/covid.
+
+```{r country_panel, include=TRUE}
+#create dataframe for country names to appear in small multiples within the
+#plot instead of in strip text
+country_panel <- df %>%
+  filter(!country %in% 
+           c('United States', 
+             'EU27_2020 - European Union - 27 countries (from 2020)')) %>% 
+  group_by(country) %>%
+  filter(year_month == 'Jan 2010') %>% 
+  filter(row_number() == 1) %>% 
+  ungroup()
+```
+
+```{r plot_small_multiples, fig.height=12, fig.width=10}
+df  %>%
+  filter(!country %in% 
+           c('United States', 
+             'EU27_2020 - European Union - 27 countries (from 2020)'), 
+         year_month >= 'Jan 2010') %>% 
+  ggplot(mapping = aes(x = year_month, y = index_2015_100)) + 
+  geom_line(data = . %>% filter(category == 'All-items HICP'), 
+            #aes(group = iso3),
+            size = .8, color = "gray80") + 
+  geom_line(data= . %>% filter(category == 'Books'),
+            color = "firebrick",
+            lineend = "round") + 
+  geom_point(data = . %>% filter(year_month == 'Aug 2020',
+                                 category == 'Books'), 
+             size = rel(1), 
+             shape = 21, 
+             color = "firebrick",
+             fill = "firebrick2") + 
+  geom_text(data= country_panel,
+            mapping = aes(label = country,
+                          x = year_month,
+                          y = 185),
+            vjust = "inward",
+            hjust = "inward",
+            fontface = "bold",
+            color = "firebrick") +
+  facet_wrap(~ country, ncol = 5) + 
+  #facet_wrap(~ reorder(cname, -cu_cases), ncol = 5) + 
+  labs(x='',
+       y='CPI, 2015 = 100\n',
+       color='', 
+       caption = 'Makeover Monday, Week 38') + 
+  theme_minimal() + 
+  theme(plot.title = element_text(size = rel(1), face = "bold"),
+        plot.subtitle = element_text(size = rel(0.7)),
+        plot.caption = element_text(size = rel(1)),
+        strip.text = element_blank(),
+        panel.spacing.x = unit(-0.05, "lines"),
+        panel.spacing.y = unit(0.3, "lines"),
+        #axis.text.y = element_text(size = rel(0.5)),
+        axis.title.x = element_text(size = rel(1)),
+        axis.title.y = element_text(size = rel(1)),
+        axis.text.x = element_text(size = rel(.75), angle = 90),
+        legend.text = element_text(size = rel(1)))
+```
+
+## Mapping  
+
+Attempting to highlight story with a map. More analysis would need to be done to determine whether it is meaningful.
 
 ```{r df_2, include=TRUE}
 df_2 <- df %>% 
@@ -95,18 +214,19 @@ df_2 %<>%
             by=c('country' = 'region'))
 ```
 
-```{r fig.height=8}
+```{r map_diff, fig.height=8}
 df_2 %>% 
   filter(year_month == 'Aug 2020',
          country != 'United States') %>% 
   ggplot(.) +
   geom_polygon(aes(x = long, y = lat, group = group, fill = cost_diff), color="gray60") +
   scale_fill_viridis() + 
-  ggtitle('Cost difference',
-          subtitle = 'August 2020') + 
-  #labs(caption = 'Using 2014 value if 2015 is NA') + 
-  #coord_map(xlim = c(-30, 60),ylim = c(45, -37)) + 
-  #map.theme + 
+  #scale_fill_gradient2() + 
+  #scale_fill_brewer(palette = 'RdBu')
+  ggtitle('Where are books more or less expensive?',
+          subtitle = 'Cost differential between the Harmonized Index of Consumer Prices (HCPI) and the cost of books') + 
+  labs(caption = 'August 2020') + 
+  map.theme + 
   theme(plot.title = element_text(size=24),
         plot.subtitle = element_text(size=18))
 ```
