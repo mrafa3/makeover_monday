@@ -20,16 +20,22 @@ Further development:
 *  Creating `year_month` using an intermediate step, but could have used `stringr::` and `lubridate::` for more direct approach.  
 *  Mapping (and the mapped story) is preliminary.  
 *  Tried to implement `RColorBrewer::` in the map, but had some challenges and moved on.  
+*  The example visualization uses a nice area effect in the time series plot (see below in the **Example(s) to learn from**). This could be achieved with `geom_ribbon()`.
 
 ## Visualization  
 
 **Original visualization**:
+
 ![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week38/graphics/yvxBGUv9Q9GJCt6g6pAZ_Price%20develpment%20of%20books%20in%20the%20EU.png)
 
 **Alternatives developed**:
+
 ![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week38/graphics/eu_ts_viz.png)
 
 ![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week38/graphics/map_viz.png)
 
 ![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week38/graphics/sm_viz.png)
 
+**Example(s) to learn from**:  
+
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week38/graphics/mm_2020wk38_example.jpg)
