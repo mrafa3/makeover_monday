@@ -7,13 +7,41 @@ output: html_notebook
 
 ```{r setup, include=TRUE}
 library(tidyverse)
+library(janitor)
 library(httr)
 library(readxl)
 library(zoo)
 library(magrittr)
 library(viridis)
+library(countrycode)
+library(extrafont)
+library(scales)
+library(patchwork)
+library(jkmisc)
+#library(glue)
 #library(lubridate)
 #library(RColorBrewer)
+```
+
+```{r my.theme, include=TRUE}
+my.theme <- theme(
+  plot.title = element_text(family="Gill Sans MT", color="black", face="bold", size=24, hjust=0), 
+  plot.subtitle = element_text(family="Gill Sans MT", color="black", size=12, hjust=0), 
+  axis.title = element_text(family="Gill Sans MT", color="black", face="bold", size=12), 
+  axis.text = element_text(family="Gill Sans MT", color="black", size=18), 
+  axis.ticks.y = element_blank(), 
+  plot.caption = element_text(family="Gill Sans MT", color="black", size=12), 
+  plot.background = element_blank(),
+  panel.background =  element_blank(), 
+  legend.background = element_blank(), 
+  panel.grid.major = element_line(colour = "grey90", size = 0.5),
+  panel.grid.minor = element_line(colour = "grey93", size = 0.5),
+  panel.border = element_blank(), 
+  #panel.border = element_rect(colour = "black", size = 0.5, fill=NA, linetype = 1),
+  legend.title=element_blank(), 
+  legend.text = element_text(family="Gill Sans MT", color="black", size=12, hjust=0),
+  legend.position = 'top',
+  strip.text = element_text(family="Gill Sans MT", color="black", size=14))
 ```
 
 ```{r map.theme, include=TRUE}
@@ -35,7 +63,30 @@ map.theme <- theme(text = element_text(color = "#FFFFFF"),
 
 ```{r read_data, include=TRUE}
 df <- read.csv("https://query.data.world/s/qss24rzobvbkg6gc7y7lzfn75c4b46",
-               header=TRUE, stringsAsFactors=FALSE)
+               header=TRUE, stringsAsFactors=FALSE) %>% 
+  clean_names()
+```
+
+```{r countrycode, include=TRUE}
+(codelist <- countrycode::codelist %>% 
+  select(un.name.en, continent, 
+         un.region.name, un.regionsub.name) %>% 
+  rename(country = un.name.en) %>% 
+  filter(!is.na(country)))
+```
+
+
+
+```{r recode_join, include=TRUE}
+df %<>% 
+  mutate(country = recode(country,
+                          "Cote d'Ivoire" = "Côte D'Ivoire",
+                          "Gambia" = "Gambia (Republic of The)",
+                          "Guinea-Bissau" = "Guinea Bissau",
+                          "Lao People's Democratic Republic" = "Lao People’s Democratic Republic")) %>% 
+  left_join(x=.,
+            y=codelist,
+            by='country')
 ```
 
 ```{r glimpse, include=TRUE}
@@ -48,20 +99,69 @@ df %>%
   summary()
 ```
 
-## Time series visualization  
+```{r}
+region_cols <- c('Southern Asia' = 'darkorchid3',
+                 'Sub-Saharan Africa' = 'springgreen4')
+```
 
-Plotting some simple time series stories from the data.
+
+# Visualizations  
+
+## Top 10 by UN region
+
+```{r top10_viz, include=TRUE, fig.height=7}
+(top10_viz <- df %>% 
+  slice_max(order_by = females_married_by_15, 
+            n =10) %>% 
+  ggplot(.,
+         aes(x=females_married_by_15,
+                   y=reorder(country, females_married_by_15))) + 
+  geom_col(aes(fill=un.regionsub.name)) +   
+  geom_text(aes(label=paste(round(females_married_by_15 * 100, 1), '%', sep = '')), 
+          vjust=0.5, 
+          size = 6, 
+          position = position_stack(vjust = 0.5),
+          color='grey98',
+          fontface='bold') +
+  geom_text(aes(x = .002, label = country), 
+            color = 'grey98', 
+            hjust = 0, 
+            vjust = 1,
+            fontface = 'bold') + 
+  scale_x_continuous(labels = percent) + 
+  labs(x='',
+       y='',
+       caption='Makeover Monday Week 39 (2020)\nData Source: UNICEF') + 
+  scale_fill_manual(values = region_cols) + 
+  my.theme + 
+  theme(legend.position = 'none',
+        axis.text = element_blank(),
+        axis.ticks = element_blank(), 
+        panel.grid.minor = element_blank(),
+        panel.grid.major = element_blank()) + 
+  plot_annotation(title='Countries with the 10 highest rates of marriage of girls in youth',
+                  subtitle=glue('As measured by the percent of girls married by age15<br>Worst countries all in ', 
+                                highlight_text("Sub-Saharan Africa", "springgreen4", "b"), 
+                                ' and ', 
+                                highlight_text("Southern Asia", "darkorchid3", "b")), 
+                  theme=theme_jk(markdown = TRUE,
+                                   plot_title_family = "Gill Sans MT",
+                                   subtitle_family = "Gill Sans MT",
+                                   axis_title_family = "Gill Sans MT",
+                                   plot_title_size = 20)))
+```
+
 
 
 # Saving graphics  
 
 ```{r save_graphics, include=TRUE}
-ggsave("graphics/eu_ts_viz.png", eu_ts_viz,
+ggsave("graphics/top10_viz.png", top10_viz,
        width = 10, height = 8, dpi = 300)
 
-ggsave("graphics/sm_viz.png", sm_viz,
+ggsave("graphics/.png", ,
        width = 10, height = 12, dpi = 300)
 
-ggsave("graphics/map_viz.png", map_viz,
+ggsave("graphics/.png", ,
        width = 10, height = 8, dpi = 300)
 ```
