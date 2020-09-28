@@ -1,0 +1,67 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+# Setup
+
+```{r setup, include=TRUE}
+library(tidyverse)
+library(httr)
+library(readxl)
+library(zoo)
+library(magrittr)
+library(viridis)
+#library(lubridate)
+#library(RColorBrewer)
+```
+
+```{r map.theme, include=TRUE}
+map.theme <- theme(text = element_text(color = "#FFFFFF"), 
+                   panel.background = element_rect(fill = "#444444"),
+                   plot.background = element_rect(fill = "#444444"),
+                   panel.grid = element_blank(),
+                   plot.title = element_text(size = 50),
+                   plot.subtitle = element_text(size = 25),
+                   plot.caption = element_text(size = 20), 
+                   axis.text = element_blank(),
+                   axis.title = element_blank(),
+                   axis.ticks = element_blank(),
+                   legend.position = "bottom", 
+                   legend.key.size = unit(1, "cm"),
+                   legend.background = element_rect(fill="#444444"),
+                   legend.title = element_blank())
+```
+
+```{r read_data, include=TRUE}
+df <- read.csv("https://query.data.world/s/qss24rzobvbkg6gc7y7lzfn75c4b46",
+               header=TRUE, stringsAsFactors=FALSE)
+```
+
+```{r glimpse, include=TRUE}
+df %>% 
+  glimpse()
+```
+
+```{r summary, include=TRUE}
+df %>% 
+  summary()
+```
+
+## Time series visualization  
+
+Plotting some simple time series stories from the data.
+
+
+# Saving graphics  
+
+```{r save_graphics, include=TRUE}
+ggsave("graphics/eu_ts_viz.png", eu_ts_viz,
+       width = 10, height = 8, dpi = 300)
+
+ggsave("graphics/sm_viz.png", sm_viz,
+       width = 10, height = 12, dpi = 300)
+
+ggsave("graphics/map_viz.png", map_viz,
+       width = 10, height = 8, dpi = 300)
+```
