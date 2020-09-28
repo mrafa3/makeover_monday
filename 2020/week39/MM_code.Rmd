@@ -144,7 +144,7 @@ region_cols <- c('Southern Asia' = 'darkorchid3',
         panel.grid.minor = element_blank(),
         panel.grid.major = element_blank()) + 
   plot_annotation(title='Countries with the 10 highest rates of marriage of girls in youth',
-                  subtitle=glue('As measured by the percent of girls married by age15<br>Worst countries all in ', 
+                  subtitle=glue('As measured by the percent of girls married by age 15<br>Worst countries all in ', 
                                 highlight_text("Sub-Saharan Africa", "springgreen4", "b"), 
                                 ' and ', 
                                 highlight_text("Southern Asia", "darkorchid3", "b")), 
