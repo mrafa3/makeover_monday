@@ -18,7 +18,7 @@ library(extrafont)
 library(scales)
 library(patchwork)
 library(jkmisc)
-#library(glue)
+library(glue)
 #library(lubridate)
 #library(RColorBrewer)
 ```
@@ -128,10 +128,13 @@ region_cols <- c('Southern Asia' = 'darkorchid3',
             hjust = 0, 
             vjust = 1,
             fontface = 'bold') + 
+  annotate("text", 
+           x=.27, y=1,
+           size=4, family="Gill Sans MT",
+           label = 'Makeover Monday Week 39 (2020)\nData Source: UNICEF') + 
   scale_x_continuous(labels = percent) + 
   labs(x='',
-       y='',
-       caption='Makeover Monday Week 39 (2020)\nData Source: UNICEF') + 
+       y='') + 
   scale_fill_manual(values = region_cols) + 
   my.theme + 
   theme(legend.position = 'none',
