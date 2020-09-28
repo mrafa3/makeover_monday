@@ -19,6 +19,7 @@ library(scales)
 library(patchwork)
 library(jkmisc)
 library(glue)
+library(ggalt)
 #library(lubridate)
 #library(RColorBrewer)
 ```
@@ -129,7 +130,7 @@ region_cols <- c('Southern Asia' = 'darkorchid3',
             vjust = 1,
             fontface = 'bold') + 
   annotate("text", 
-           x=.3, y=1,
+           x=.3, y=1.25,
            size=4, family="Gill Sans MT",
            label = 'Makeover Monday Week 39 (2020)\nData Source: UNICEF',
            hjust = 1) + 
@@ -143,11 +144,11 @@ region_cols <- c('Southern Asia' = 'darkorchid3',
         axis.ticks = element_blank(), 
         panel.grid.minor = element_blank(),
         panel.grid.major = element_blank()) + 
-  plot_annotation(title='Countries with the 10 highest rates of marriage of girls in youth',
-                  subtitle=glue('As measured by the percent of girls married by age 15<br>Worst countries all in ', 
+  plot_annotation(title=glue('Child marriage: a **human rights** issue that perpetuates **inequality**'),
+                  subtitle=glue('Worst countries all in ', 
                                 highlight_text("Sub-Saharan Africa", "springgreen4", "b"), 
                                 ' and ', 
-                                highlight_text("Southern Asia", "darkorchid3", "b")), 
+                                highlight_text("Southern Asia", "darkorchid3", "b"), ' (% of girls married by age 15)'), 
                   theme=theme_jk(markdown = TRUE,
                                    plot_title_family = "Gill Sans MT",
                                    subtitle_family = "Gill Sans MT",
@@ -155,7 +156,41 @@ region_cols <- c('Southern Asia' = 'darkorchid3',
                                    plot_title_size = 20)))
 ```
 
-
+```{r fig.height=7.5}
+(disparity_viz <- df %>% 
+  mutate(diff_by_18 = females_married_by_18 - males_married_by_18) %>% 
+  slice_max(order_by = diff_by_18, n = 10) %>% 
+  #select(-females_married_by_15) %>% 
+  #gather(gender, percent_married, 2:3) %>% 
+  ggplot(.) + 
+  geom_dumbbell(aes(x=males_married_by_18,
+                    xend=females_married_by_18,
+                    y=reorder(country, diff_by_18)),
+                size_x = 8,
+                size_xend = 8,
+                color = 'gray60', 
+                colour_x = 'darkorchid3',
+                colour_xend = 'springgreen4') + 
+  labs(x='',
+       y='',
+       caption = "Makeover Monday Week 39 (2020)\nData Source: UNICEF") + 
+  scale_x_continuous(labels = c('', '20%', '40%', '60%', '80%'),
+                     position = 'top') + 
+  my.theme + 
+  theme(panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_text(size=14)) + 
+  plot_annotation(title = 'Countries with wide **disparities** in rates of **youth marriage among boys and girls**',
+                  subtitle = glue('Top 10 countries with widest gap between ', 
+                                  highlight_text("boys", "darkorchid3", "b"), 
+                                  ' and ', 
+                                  highlight_text("girls", "springgreen4", "b"),
+                                  ' (% of girls and boys married by age 18, arranged by the size of the gap)'),
+                  theme = theme_jk(markdown = TRUE,
+                                   plot_title_family = "Gill Sans MT",
+                                   subtitle_family = "Gill Sans MT")))
+```
 
 # Saving graphics  
 
@@ -163,9 +198,6 @@ region_cols <- c('Southern Asia' = 'darkorchid3',
 ggsave("graphics/top10_viz.png", top10_viz,
        width = 10, height = 8, dpi = 300)
 
-ggsave("graphics/.png", ,
+ggsave("graphics/disparity_viz.png", disparity_viz,
        width = 10, height = 12, dpi = 300)
-
-ggsave("graphics/.png", ,
-       width = 10, height = 8, dpi = 300)
 ```
