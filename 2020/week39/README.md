@@ -13,6 +13,7 @@ Some highlights:
 
 *  Used the `countrycode::` package to join country names on the UN regions and subregions.  
 *  Used `anti_join()` to see what names weren't matching, and used `pull()` to print a vector of the country names that I could copy and paste.  
+*  Used `ggalt::dumbell_plot()` to show gap between boys and girls.  
 
 Further development:  
 
@@ -29,7 +30,7 @@ Further development:
 
 ![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week39/graphics/top10_viz.png)
 
-![]()
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week39/graphics/disparity_viz.png)
 
 ![]()
 
