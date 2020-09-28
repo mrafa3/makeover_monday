@@ -129,9 +129,10 @@ region_cols <- c('Southern Asia' = 'darkorchid3',
             vjust = 1,
             fontface = 'bold') + 
   annotate("text", 
-           x=.27, y=1,
+           x=.3, y=1,
            size=4, family="Gill Sans MT",
-           label = 'Makeover Monday Week 39 (2020)\nData Source: UNICEF') + 
+           label = 'Makeover Monday Week 39 (2020)\nData Source: UNICEF',
+           hjust = 1) + 
   scale_x_continuous(labels = percent) + 
   labs(x='',
        y='') + 
