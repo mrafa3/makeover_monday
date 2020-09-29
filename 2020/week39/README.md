@@ -13,9 +13,12 @@ Some highlights:
 
 *  Used the `countrycode::` package to join country names on the UN regions and subregions.  
 *  Used `anti_join()` to see what names weren't matching, and used `pull()` to print a vector of the country names that I could copy and paste.  
-*  Used `ggalt::dumbell_plot()` to show gap between boys and girls.  
+*  Used `ggalt::dumbell_plot()` to show gap between boys and girls.
+*  Used `worldtilemap` (a ggplot extension) to create a tilemap -- a stylized world map. 
 
 Further development:  
+
+*  The formatting on the tile map is not polished and still working on the fonts.  
 
 ## Visualization  
 
@@ -32,7 +35,7 @@ Further development:
 
 ![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week39/graphics/disparity_viz.png)
 
-![]()
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week39/graphics/tilemap_viz.png)
 
 **Example(s) to learn from**:  
 

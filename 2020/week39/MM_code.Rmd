@@ -1,5 +1,5 @@
 ---
-title: "R Notebook"
+title: "Makeover Monday: Week 39 (2020)"
 output: html_notebook
 ---
 
@@ -8,9 +8,6 @@ output: html_notebook
 ```{r setup, include=TRUE}
 library(tidyverse)
 library(janitor)
-library(httr)
-library(readxl)
-library(zoo)
 library(magrittr)
 library(viridis)
 library(countrycode)
@@ -20,6 +17,11 @@ library(patchwork)
 library(jkmisc)
 library(glue)
 library(ggalt)
+library(worldtilegrid)
+#devtools::install_github("hrbrmstr/worldtilegrid")
+#library(httr)
+#library(readxl)
+#library(zoo)
 #library(lubridate)
 #library(RColorBrewer)
 ```
@@ -45,23 +47,6 @@ my.theme <- theme(
   strip.text = element_text(family="Gill Sans MT", color="black", size=14))
 ```
 
-```{r map.theme, include=TRUE}
-map.theme <- theme(text = element_text(color = "#FFFFFF"), 
-                   panel.background = element_rect(fill = "#444444"),
-                   plot.background = element_rect(fill = "#444444"),
-                   panel.grid = element_blank(),
-                   plot.title = element_text(size = 50),
-                   plot.subtitle = element_text(size = 25),
-                   plot.caption = element_text(size = 20), 
-                   axis.text = element_blank(),
-                   axis.title = element_blank(),
-                   axis.ticks = element_blank(),
-                   legend.position = "bottom", 
-                   legend.key.size = unit(1, "cm"),
-                   legend.background = element_rect(fill="#444444"),
-                   legend.title = element_blank())
-```
-
 ```{r read_data, include=TRUE}
 df <- read.csv("https://query.data.world/s/qss24rzobvbkg6gc7y7lzfn75c4b46",
                header=TRUE, stringsAsFactors=FALSE) %>% 
@@ -75,8 +60,6 @@ df <- read.csv("https://query.data.world/s/qss24rzobvbkg6gc7y7lzfn75c4b46",
   rename(country = un.name.en) %>% 
   filter(!is.na(country)))
 ```
-
-
 
 ```{r recode_join, include=TRUE}
 df %<>% 
@@ -100,11 +83,10 @@ df %>%
   summary()
 ```
 
-```{r}
+```{r region_cols, include=TRUE}
 region_cols <- c('Southern Asia' = 'darkorchid3',
                  'Sub-Saharan Africa' = 'springgreen4')
 ```
-
 
 # Visualizations  
 
@@ -156,7 +138,9 @@ region_cols <- c('Southern Asia' = 'darkorchid3',
                                    plot_title_size = 20)))
 ```
 
-```{r fig.height=7.5}
+## Difference in groups: dumbell plot  
+
+```{r disparity_viz, include=TRUE, fig.height=7.5}
 (disparity_viz <- df %>% 
   mutate(diff_by_18 = females_married_by_18 - males_married_by_18) %>% 
   slice_max(order_by = diff_by_18, n = 10) %>% 
@@ -192,6 +176,44 @@ region_cols <- c('Southern Asia' = 'darkorchid3',
                                    subtitle_family = "Gill Sans MT")))
 ```
 
+# Tile map: a stylized world map  
+
+```{r map.theme, include=TRUE}
+map.theme <- theme(text = element_text(color = "#929299"), 
+                   panel.background = element_rect(fill = "#252a32"),
+                   plot.background = element_rect(fill = "#252a32"),
+                   panel.grid = element_blank(),
+                   plot.title = element_text(size = 50),
+                   plot.subtitle = element_text(size = 25),
+                   plot.caption = element_text(size = 20), 
+                   axis.text = element_blank(),
+                   axis.title = element_blank(),
+                   axis.ticks = element_blank(),
+                   legend.position = "bottom", 
+                   legend.key.size = unit(1, "cm"),
+                   legend.background = element_rect(fill="#252a32"),
+                   legend.title = element_blank())
+```
+
+```{r}
+hrbrthemes::theme_ft_rc()
+```
+
+```{r tilemap, include=TRUE, fig.height=7, fig.width=10}
+(tilemap_viz <- df %>% 
+  ggplot(.,
+         aes(country = country,
+             fill=females_married_by_15)) + 
+  geom_wtg() + 
+  geom_text(aes(label = stat(alpha.2)), stat="wtg", size=2) + 
+  coord_equal() +
+  viridis::scale_fill_viridis(option = 'inferno') + 
+  hrbrthemes::theme_ft_rc() +
+  labs(fill = '') + 
+  theme_enhance_wtg())
+```
+
+
 # Saving graphics  
 
 ```{r save_graphics, include=TRUE}
@@ -200,4 +222,7 @@ ggsave("graphics/top10_viz.png", top10_viz,
 
 ggsave("graphics/disparity_viz.png", disparity_viz,
        width = 10, height = 12, dpi = 300)
+
+ggsave("graphics/tilemap_viz.png", tilemap_viz,
+       width = 10, height = 7, dpi = 300)
 ```
