@@ -178,27 +178,6 @@ region_cols <- c('Southern Asia' = 'darkorchid3',
 
 # Tile map: a stylized world map  
 
-```{r map.theme, include=TRUE}
-map.theme <- theme(text = element_text(color = "#929299"), 
-                   panel.background = element_rect(fill = "#252a32"),
-                   plot.background = element_rect(fill = "#252a32"),
-                   panel.grid = element_blank(),
-                   plot.title = element_text(size = 50),
-                   plot.subtitle = element_text(size = 25),
-                   plot.caption = element_text(size = 20), 
-                   axis.text = element_blank(),
-                   axis.title = element_blank(),
-                   axis.ticks = element_blank(),
-                   legend.position = "bottom", 
-                   legend.key.size = unit(1, "cm"),
-                   legend.background = element_rect(fill="#252a32"),
-                   legend.title = element_blank())
-```
-
-```{r}
-hrbrthemes::theme_ft_rc()
-```
-
 ```{r tilemap, include=TRUE, fig.height=7, fig.width=10}
 (tilemap_viz <- df %>% 
   ggplot(.,
