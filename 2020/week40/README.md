@@ -11,9 +11,14 @@ Repo for Makeover Monday exercise, Week 40 (2020).
 
 Some highlights:
 
+*  Used `ggtext::element_markdown()` in my ggplot labels for having a horizontal y-axis label for better legibility.  
+*  Used `lead()` and `zoo::rollmean()` to calculate a moving average to show a smooth historical line plot.  
 
 Further development:  
 
+*  Could do which metro faired the worst in the 2008 financial crisis (maybe a dumbbell plot to show the largest falls).  
+*  Original analysis appears to have connected counties to produce the analysis. It would be interesting to replicate that method, because it does change the conclusions.  
+*  This dataset provides a way to explore the question, "what growth rates are possible to see at smaller geographies"? This is a question that came up in the context of our work in Northeast Nigeria.  
 
 ## Visualization  
 
@@ -21,6 +26,7 @@ Further development:
 
 *  The spike shows the relative magnitude of NYC well, but not much else.  
 *  If you just look at the placement of the spikes, it does illustrate the concentration in California and on the east coast. However, I don't think that mapping this is very effective. Given that this is data on metro areas, there is going to be lots of unused space, and I don't think the map is the clear takeaway.  
+
 
 ![us-metro-areas-by-gdp.png](https://www.visualcapitalist.com/wp-content/uploads/2020/09/us-metro-areas-by-gdp.jpg)
 
