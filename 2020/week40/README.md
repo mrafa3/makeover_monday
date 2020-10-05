@@ -32,9 +32,9 @@ Further development:
 
 **Alternatives developed**:
 
-![]()
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week40/graphics/ma3_top3_viz.png)
 
-![]()
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week40/graphics/top3_over_time_viz.png)
 
 ![]()
 
