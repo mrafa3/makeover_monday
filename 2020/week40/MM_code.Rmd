@@ -1,0 +1,168 @@
+---
+title: "Makeover Monday: Week 39 (2020)"
+output: html_notebook
+---
+
+# Setup
+
+```{r setup, include=TRUE}
+library(tidyverse)
+library(janitor)
+library(magrittr)
+library(viridis)
+library(countrycode)
+library(extrafont)
+library(scales)
+library(patchwork)
+library(jkmisc)
+library(glue)
+library(ggalt)
+
+#library(worldtilegrid)
+#devtools::install_github("hrbrmstr/worldtilegrid")
+#library(httr)
+#library(readxl)
+#library(zoo)
+#library(lubridate)
+#library(RColorBrewer)
+```
+
+```{r my.theme, include=TRUE}
+my.theme <- theme(
+  plot.title = element_text(family="Gill Sans MT", color="black", face="bold", size=24, hjust=0), 
+  plot.subtitle = element_text(family="Gill Sans MT", color="black", size=12, hjust=0), 
+  axis.title = element_text(family="Gill Sans MT", color="black", size=12), 
+  axis.text = element_text(family="Gill Sans MT", color="black", size=18), 
+  axis.ticks.y = element_blank(), 
+  plot.caption = element_text(family="Gill Sans MT", color="black", size=12), 
+  plot.background = element_blank(),
+  panel.background =  element_blank(), 
+  legend.background = element_blank(), 
+  panel.grid.major = element_line(colour = "grey90", size = 0.5),
+  panel.grid.minor = element_line(colour = "grey93", size = 0.5),
+  panel.border = element_blank(), 
+  #panel.border = element_rect(colour = "black", size = 0.5, fill=NA, linetype = 1),
+  legend.title=element_blank(), 
+  legend.text = element_text(family="Gill Sans MT", color="black", size=12, hjust=0),
+  legend.position = 'top',
+  strip.text = element_text(family="Gill Sans MT", color="black", size=14))
+```
+
+```{r read_data, include=TRUE}
+df <- read.csv("https://query.data.world/s/ijl5d24ix7rid2e64g5xwxfksr5gvb", 
+               header=TRUE, stringsAsFactors=FALSE) %>%
+  clean_names() %>% 
+  mutate(gdp_chained = gdp_chained / 1000000000)
+```
+
+```{r glimpse, include=TRUE}
+df %>% 
+  glimpse()
+```
+
+```{r summary, include=TRUE}
+df %>% 
+  summary()
+```
+
+```{r county_cols, include=TRUE}
+county_cols <- c('Los Angeles' = 'turquoise4',
+                 'New York' = 'springgreen3',
+                 'Cook' = 'firebrick3')
+```
+
+# Visualizations  
+
+## NYC vs. LA
+
+```{r top3_2018, include=TRUE}
+top3_2018 <- df %>% 
+  filter(i_year == 2018) %>% 
+  slice_max(order_by = gdp_chained, 
+            n = 3) %>% 
+  pull(county_fips)
+```
+
+```{r nyc_plot, include=TRUE, fig.height=6.2}
+(top3_over_time_viz <- df %>% 
+  filter(county_fips %in% top3_2018) %>% 
+  ggplot(.,
+         aes(x=i_year,
+             y=gdp_chained,
+             group=county_fips,
+             color=county)) + 
+  geom_line(size=1.25) + 
+  labs(x='',
+       y='GDP (billions)',
+       caption = 'Makeover Monday Week 40 (2020)') + 
+  scale_color_manual(values = county_cols) + 
+  scale_y_continuous(limits = c(200, 750)) + 
+  my.theme + 
+  theme(axis.title.y = ggtext::element_markdown(size=14, angle = 0),
+        legend.position = 'none',
+        axis.ticks = element_blank()) + 
+  plot_annotation(title = glue('GDP of ', 
+                  {highlight_text("New York", "springgreen3", "b", 24)}, 
+                  ' , ', 
+                  {highlight_text("Los Angeles", "turquoise4", "b", 24)}, 
+                  ' counties',
+                  {highlight_text("Cook", "firebrick3", "b", 24)},
+                  ' (Chicago) counties (2001-2018)'),
+                  subtitle = 'Source: Bureau of Economic Analysis', 
+                  theme = theme_jk(markdown = TRUE,
+                                   plot_title_family = "Gill Sans MT",
+                                   subtitle_family = "Gill Sans MT")))
+```
+
+## Growth rates  
+
+```{r make_df_growth, include=TRUE}
+df_growth <- df %>% 
+  group_by(county_fips) %>% 
+  mutate(gdp_chained_t_minus_1 = lead(gdp_chained, n=1, order_by = -i_year)) %>% 
+  mutate(gdp_growth_rate = (gdp_chained - gdp_chained_t_minus_1) / gdp_chained_t_minus_1 * 100) %>% 
+  arrange(i_year) %>% 
+  mutate(ma3_gdp_growth_rate = zoo::rollmean(gdp_growth_rate, k=3, align='right', na.pad=TRUE))
+```
+
+```{r ma3_top3_viz, include=TRUE, fig.height=6.2}
+(ma3_top3_viz <- df_growth %>% 
+  filter(county_fips %in% top3_2018) %>% 
+  filter(i_year >= 2004) %>% 
+  ggplot(.,
+         aes(x=i_year,
+             y=ma3_gdp_growth_rate / 100,
+             group=county_fips,
+             color=county)) + 
+  geom_line(size=1.25) + 
+  scale_color_manual(values = county_cols) + 
+  labs(x='',
+       y='GDP growth rate<br>(5-year MA)',
+       caption = 'Makeover Monday Week 40 (2020)') + 
+  scale_y_continuous(labels = percent) + 
+  my.theme + 
+    theme(axis.title.y = ggtext::element_markdown(size=14, angle = 0),
+        legend.position = 'none',
+        axis.ticks = element_blank()) + 
+  plot_annotation(title = glue('GDP growth rates of ', 
+                  {highlight_text("New York", "springgreen3", "b", 24)}, 
+                  ' , ', 
+                  {highlight_text("Los Angeles", "turquoise4", "b", 24)},
+                  ' and ',
+                  {highlight_text("Cook", "firebrick3", "b", 24)},
+                  ' (Chicago) counties (2004-2018)'),
+                  subtitle = 'Using a 3-year moving average<br>*Source: Bureau of Economic Analysis*', 
+                  theme = theme_jk(markdown = TRUE,
+                                   plot_title_family = "Gill Sans MT",
+                                   subtitle_family = "Gill Sans MT")))
+```
+
+# Saving graphics  
+
+```{r save_graphics, include=TRUE}
+ggsave("graphics/top3_over_time_viz.png", top3_over_time_viz,
+       width = 10, height = 8, dpi = 300)
+
+ggsave("graphics/ma3_top3_viz.png", ma3_top3_viz,
+       width = 10, height = 8, dpi = 300)
+```
