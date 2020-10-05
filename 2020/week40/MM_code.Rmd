@@ -137,7 +137,7 @@ df_growth <- df %>%
   geom_line(size=1.25) + 
   scale_color_manual(values = county_cols) + 
   labs(x='',
-       y='GDP growth rate<br>(5-year MA)',
+       y='GDP growth rate<br>(3-year MA)',
        caption = 'Makeover Monday Week 40 (2020)') + 
   scale_y_continuous(labels = percent) + 
   my.theme + 
