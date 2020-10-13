@@ -68,7 +68,13 @@ industry_cols <- c('Financial' = 'darkorange2',
 df <- df %>% 
   mutate(financial_sector = 
            ifelse(industry_sector %in% financial_sector,
-                  'Financial', 'Other')) 
+                  'Financial', 'Other')) %>% 
+  mutate(industry_sector_2 = ifelse(financial_sector == 'Financial', industry_sector, 'Other'))
+```
+
+```{r industry_map, include=TRUE}
+industry_map <- df %>% 
+  select(financial_sector, industry_sector_2)
 ```
 
 ```{r glimpse, include=TRUE}
@@ -82,8 +88,6 @@ df %>%
 ```
 
 # Visualizations  
-
-
 
 ```{r fig.height=6.2}
 df %>% 
@@ -101,14 +105,25 @@ df %>%
 
 ```{r fig.height=6.2}
 df %>% 
-
-  ggplot(.) + 
-  geom_bar(aes(x=respondents_percent,
-               y=industry_sector,
-               fill=financial_sector), 
-           position = 'stack') + 
-
-  my.theme
+  group_by(industry_sector_2) %>% 
+  summarise(respondents_percent = sum(respondents_percent, na.rm=TRUE)) %>% 
+  mutate(financial_sector = 
+           ifelse(industry_sector_2 %in% financial_sector,
+                  'Financial', 'Other'),
+         industry = 'Industry') %>% 
+  ggplot(.,
+         aes(x=respondents_percent,
+             y=industry)) + 
+  geom_bar(aes(fill=financial_sector), 
+           color='black',
+           position = 'stack', stat = 'identity') + 
+  #ggrepel::geom_text_repel(aes(label=industry_sector_2),
+   #                        force=20) + 
+  scale_fill_manual(values = c('Financial' = 'darkorange2',
+                               'Other' = 'white')) + 
+  coord_polar() + 
+  my.theme + 
+  theme(legend.position = 'none')
 ```
 
 
