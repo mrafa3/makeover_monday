@@ -1,6 +1,5 @@
 ---
 title: "Makeover Monday: Week 41 (2020)"
-output: html_notebook
 ---
 
 # Setup
@@ -29,12 +28,12 @@ library(readxl)
 
 ```{r my.theme, include=TRUE}
 my.theme <- theme(
-  plot.title = element_text(family="Gill Sans MT", color="black", face="bold", size=24, hjust=0), 
-  plot.subtitle = element_text(family="Gill Sans MT", color="black", size=12, hjust=0), 
-  axis.title = element_text(family="Gill Sans MT", color="black", size=12), 
-  axis.text = element_text(family="Gill Sans MT", color="black", size=18), 
-  axis.ticks.y = element_blank(), 
-  plot.caption = element_text(family="Gill Sans MT", color="black", size=12), 
+  plot.title = element_text(family="Palatino Linotype", color="black", face="bold", size=24, hjust=0), 
+  plot.subtitle = element_text(family="Palatino Linotype", color="black", size=12, hjust=0), 
+  axis.title = element_text(family="Palatino Linotype", color="black", size=12), 
+  axis.text = element_text(family="Palatino Linotype", color="black", size=18), 
+  axis.ticks = element_blank(), 
+  plot.caption = element_text(family="Palatino Linotype", color="black", size=12), 
   plot.background = element_blank(),
   panel.background =  element_blank(), 
   legend.background = element_blank(), 
@@ -43,9 +42,9 @@ my.theme <- theme(
   panel.border = element_blank(), 
   #panel.border = element_rect(colour = "black", size = 0.5, fill=NA, linetype = 1),
   legend.title=element_blank(), 
-  legend.text = element_text(family="Gill Sans MT", color="black", size=12, hjust=0),
+  legend.text = element_text(family="Palatino Linotype", color="black", size=12, hjust=0),
   legend.position = 'top',
-  strip.text = element_text(family="Gill Sans MT", color="black", size=14))
+  strip.text = element_text(family="Palatino Linotype", color="black", size=14))
 ```
 
 ```{r read_data, include=TRUE}
@@ -61,7 +60,7 @@ financial_sector <- c('Financial services - other',
                       'Financial services - banking')
 
 industry_cols <- c('Financial' = 'darkorange2',
-                   'Other' = 'gray60')
+                   'Other' = 'gray80')
 ```
 
 ```{r mutate_df, include=TRUE}
@@ -91,16 +90,25 @@ df %>%
 
 ```{r fig.height=6.2}
 df %>% 
-  ggplot(.) + 
-  geom_col(aes(x=respondents_percent / 100,
-               y=reorder(industry_sector, respondents_percent),
-               fill=financial_sector)) + 
+  ggplot(.,
+         aes(x=respondents_percent / 100,
+               y=reorder(industry_sector, respondents_percent))) + 
+  geom_col(aes(fill=financial_sector)) + 
+  geom_text(aes(x=respondents_percent / 100 + .01,
+                label=paste(respondents_percent, '%', sep="")),
+            family='Palatino Linotype', fontface='bold') + 
   scale_x_continuous(limits = c(0, .15),
                      labels = percent) + 
   scale_fill_manual(values = industry_cols) + 
-  coord_polar() + 
   my.theme + 
-  theme(legend.position = 'none')
+  theme(legend.position = 'none',
+        axis.title = element_blank(),
+        axis.text.x = element_blank(),
+        axis.text.y = element_text(size=14), 
+        panel.grid.major = element_blank(),
+        panel.grid.minor = element_blank())
+  plot_annotation(theme = theme_jk(markdown = TRUE),
+                  title = "")
 ```
 
 ```{r fig.height=6.2}
