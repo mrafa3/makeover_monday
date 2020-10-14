@@ -11,6 +11,9 @@ Repo for Makeover Monday exercise, Week 41 (2020).
 
 Some highlights:
 
+*  Simple and aesthetically clean visualization that uses the `jkmisc::theme_jk()` function to have a colored subtitle to allow without a legend.  
+*  I have some code experimenting with `coord_polar()`, which looks cool, but I think detracts too much from a pretty clean takeaway.  
+*  Experimented with creating a donut plot of the same takeaway, but it is incomplete.  
 
 Further development:  
 
@@ -29,7 +32,7 @@ Further development:
 
 **Alternatives developed**:
 
-![]()
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week41/graphics/respondents_plot.png)
 
 ![]()
 

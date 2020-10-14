@@ -88,8 +88,8 @@ df %>%
 
 # Visualizations  
 
-```{r fig.height=6.2}
-df %>% 
+```{r respondents_plot, fig.height=6.2}
+(respondents_plot <- df %>% 
   ggplot(.,
          aes(x=respondents_percent / 100,
                y=reorder(industry_sector, respondents_percent))) + 
@@ -97,6 +97,7 @@ df %>%
   geom_text(aes(x=respondents_percent / 100 + .01,
                 label=paste(respondents_percent, '%', sep="")),
             family='Palatino Linotype', fontface='bold') + 
+  annotate("text", label="Makeover Monday\nWeek 41 (2020)", x=.11, y=2, family="Palatino Linotype") + 
   scale_x_continuous(limits = c(0, .15),
                      labels = percent) + 
   scale_fill_manual(values = industry_cols) + 
@@ -106,9 +107,13 @@ df %>%
         axis.text.x = element_blank(),
         axis.text.y = element_text(size=14), 
         panel.grid.major = element_blank(),
-        panel.grid.minor = element_blank())
-  plot_annotation(theme = theme_jk(markdown = TRUE),
-                  title = "")
+        panel.grid.minor = element_blank()) + 
+  plot_annotation(theme = theme_jk(markdown = TRUE,
+                                   plot_title_family = "Palatino Linotype",
+                                   subtitle_family = "Palatino Linotype"),
+                  title = "Responses to data and analytics strategy adoption survey by **dataIQ**",
+                  subtitle = glue("Percent of respondents by industry, highlighting the ", 
+                                  {highlight_text("financial sector", "darkorange2", "b")})))
 ```
 
 ```{r fig.height=6.2}
@@ -155,6 +160,6 @@ df %>%
 # Saving graphics  
 
 ```{r save_graphics, include=TRUE}
-ggsave("graphics/.png", ,
+ggsave("graphics/respondents_plot.png", respondents_plot,
        width = 10, height = 8, dpi = 300)
 ```
