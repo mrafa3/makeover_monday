@@ -13,9 +13,10 @@ Some highlights:
 
 *  Simple and aesthetically clean visualization that uses the `jkmisc::theme_jk()` function to have a colored subtitle to allow without a legend.  
 *  I have some code experimenting with `coord_polar()`, which looks cool, but I think detracts too much from a pretty clean takeaway.  
-*  Experimented with creating a donut plot of the same takeaway, but it is incomplete.  
 
 Further development:  
+
+*  Experimented with creating a donut plot of the same takeaway, but it is incomplete.  
 
 
 ## Visualization  
