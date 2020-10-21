@@ -32,7 +32,7 @@ Further development:
 
 **Alternatives developed**:
 
-![]()
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week42/graphics/healthexp_bar_viz.png)
 
 ![]()
 
