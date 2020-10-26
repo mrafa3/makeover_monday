@@ -26,7 +26,7 @@ Further development:
 
 **Alternatives developed**:
 
-![]()
+![](https://github.com/mrafa3/makeover_monday/blob/master/2020/week43/graphics/lockdown_viz.png)
 
 ![]()
 
