@@ -1,0 +1,122 @@
+---
+title: "Makeover Monday: Week 43 (2020)"
+---
+
+# Setup
+
+```{r setup, include=TRUE}
+library(tidyverse)
+library(janitor)
+library(magrittr)
+library(viridis)
+library(countrycode)
+library(extrafont)
+library(scales)
+library(patchwork)
+library(jkmisc)
+library(glue)
+library(ggalt)
+library(lubridate)
+
+#library(worldtilegrid)
+#devtools::install_github("hrbrmstr/worldtilegrid")
+library(httr)
+library(readxl)
+#library(zoo)
+#library(lubridate)
+#library(RColorBrewer)
+```
+
+```{r my.theme, include=TRUE}
+my.theme <- theme(
+  plot.title = element_text(family="Centaur", color="black", face="bold", size=24, hjust=0), 
+  plot.subtitle = element_text(family="Centaur", color="black", size=12, hjust=0), 
+  axis.title = element_text(family="Centaur", color="black", size=12), 
+  axis.text = element_text(family="Centaur", color="black", size=18), 
+  axis.ticks.y = element_blank(), 
+  plot.caption = element_text(family="Centaur", color="black", size=12), 
+  plot.background = element_blank(),
+  panel.background =  element_blank(), 
+  legend.background = element_blank(), 
+  panel.grid.major = element_line(colour = "grey90", size = 0.5),
+  panel.grid.minor = element_line(colour = "grey93", size = 0.5),
+  panel.border = element_blank(), 
+  #panel.border = element_rect(colour = "black", size = 0.5, fill=NA, linetype = 1),
+  legend.title=element_blank(), 
+  legend.text = element_text(family="Centaur", color="black", size=12, hjust=0),
+  legend.position = 'top',
+  strip.text = element_text(family="Centaur", color="black", size=16, face = 'bold'),
+  strip.background = element_blank())
+```
+
+```{r read_data, include=TRUE}
+GET("https://query.data.world/s/tqszxnb67ctdckz2d3weth6spfg555", write_disk(tf <- tempfile(fileext = ".xlsx")))
+df <- read_excel(tf) %>% 
+  clean_names() %>% 
+  mutate(month_year = paste(month, year, sep = '-')) %>% 
+  mutate(month_year = 
+           lubridate::parse_date_time(month_year,
+                                      orders = "my"),
+         gov_response = ifelse(country %in% c('India', 'El Salvador', 'Honduras'), 'Strict Lockdowns', 'No or Weak/Partial Lockdowns'))
+```
+
+```{r glimpse, include=TRUE}
+df %>% 
+  glimpse()
+```
+
+```{r summary, include=TRUE}
+df %>% 
+  summary()
+```
+
+# Visualizations  
+
+```{r fig.height=6.2}
+(lockdown_viz <- df %>% 
+  select(-month_year) %>% 
+  group_by(country, month) %>% 
+  mutate(exports_value_t_minus_1 = lead(exports_usd_millions, n=1, order_by = -year)) %>% 
+  mutate(exports_growth_rate = (exports_usd_millions - exports_value_t_minus_1) / exports_usd_millions * 100) %>% 
+  ungroup() %>% 
+  filter(complete.cases(.),
+         month == 'May') %>% 
+  ggplot(.,
+         aes(x=country)) + 
+  geom_segment(aes(xend=country,
+                   y=exports_usd_millions,
+                   yend=exports_value_t_minus_1)) + 
+  geom_point(aes(y=exports_usd_millions),
+             color='red3', size=5) + 
+  geom_point(aes(y=exports_value_t_minus_1),
+             color='gray60', size=5) + 
+  geom_text(aes(y=exports_value_t_minus_1 + 75,
+                label=paste(round(exports_growth_rate, 0), 
+                  "%", sep = '')),
+            color='red3', fontface='bold', size=6) + 
+  facet_wrap(~gov_response,
+             scales = 'free_x') + 
+  labs(x='',
+       y='Exports\n(million US$)') + 
+  my.theme + 
+  theme(axis.title.y = element_text(angle = 0),
+        axis.ticks = element_blank()) + 
+    plot_annotation(theme=theme_jk(markdown = TRUE,
+                                 plot_title_family = 'Centaur',
+                                 subtitle_family = 'Centaur',
+                                 caption_family = 'Centaur'),
+                  title='Impact of COVID-19 pandemic on apparel exports to the United States',
+                  subtitle=glue('Comparing ', 
+                             {highlight_text("May 2019", "gray60", "b", 24)}, 
+                             ' with ',
+                             {highlight_text("May 2020", "red3", "b", 24)},
+                             ' and whether the exporting country had lockdowns in place'), 
+                  caption='Makeover Monday Week 43 (2020)<br>**Source**: OTEXA'))
+```
+
+# Saving graphics  
+
+```{r save_graphics, include=TRUE}
+ggsave("graphics/lockdown_viz.png", lockdown_viz,
+       width = 10, height = 6, dpi = 300)
+```
